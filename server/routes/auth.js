@@ -4,18 +4,17 @@ import passport from 'passport';
 /**
  * OAuth routes for third-party login (Google, Facebook).
  * Uses Passport.js strategies configured in config/passport.js.
+ * Establishes session on successful authentication.
  */
 export function createAuthRoutes({ frontendUrl, tokenStore }) {
   const router = Router();
 
-  const createTokenAndRedirect = (req, res) => {
+  const createSessionAndRedirect = (req, res) => {
     if (!req.user) {
       return res.redirect(`${frontendUrl}/login?error=Authentication+failed`);
     }
-    const token = crypto.randomUUID();
-    tokenStore.set(token, req.user);
-    setTimeout(() => tokenStore.delete(token), 5 * 60 * 1000); // 5 min expiry
-    res.redirect(`${frontendUrl}/auth/callback?token=${token}`);
+    req.session.user = { id: req.user.id, username: req.user.username };
+    res.redirect(`${frontendUrl}/auth/callback`);
   };
 
   // Google OAuth
@@ -28,7 +27,7 @@ export function createAuthRoutes({ frontendUrl, tokenStore }) {
         session: false,
         failureRedirect: `${frontendUrl}/login?error=Google+sign-in+failed`,
       }),
-      createTokenAndRedirect
+      createSessionAndRedirect
     );
   } else {
     router.get('/google', (_req, res) =>
@@ -46,7 +45,7 @@ export function createAuthRoutes({ frontendUrl, tokenStore }) {
         session: false,
         failureRedirect: `${frontendUrl}/login?error=Facebook+sign-in+failed`,
       }),
-      createTokenAndRedirect
+      createSessionAndRedirect
     );
   } else {
     router.get('/facebook', (_req, res) =>
@@ -54,7 +53,26 @@ export function createAuthRoutes({ frontendUrl, tokenStore }) {
     );
   }
 
-  // Exchange one-time token for user (used after OAuth redirect to frontend)
+  // Get current user from session
+  router.get('/me', (req, res) => {
+    if (!req.session?.user) {
+      return res.status(401).json({ message: 'Not authenticated' });
+    }
+    res.json({ user: req.session.user });
+  });
+
+  // Logout - destroy session
+  router.post('/logout', (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({ message: 'Logout failed' });
+      }
+      res.clearCookie('connect.sid', { path: '/' });
+      res.json({ success: true });
+    });
+  });
+
+  // Exchange one-time token for user (fallback for OAuth when session cookie not sent)
   router.get('/session', (req, res) => {
     const token = req.query.token;
     if (!token) return res.status(400).json({ message: 'Token required' });
@@ -63,6 +81,7 @@ export function createAuthRoutes({ frontendUrl, tokenStore }) {
     tokenStore.delete(token);
     if (!user) return res.status(401).json({ message: 'Invalid or expired token' });
 
+    req.session.user = { id: user.id, username: user.username };
     res.json({
       user: {
         id: user.id,

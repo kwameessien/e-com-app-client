@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import session from 'express-session';
 import bcrypt from 'bcryptjs';
 import passport from 'passport';
 import { configurePassport } from './config/passport.js';
@@ -11,8 +12,24 @@ const PORT = process.env.PORT || 3001;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 const API_URL = process.env.API_URL || `http://localhost:${PORT}`;
 
-app.use(cors());
+app.use(cors({
+  origin: FRONTEND_URL,
+  credentials: true,
+}));
 app.use(express.json());
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'dev-secret-change-in-production',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    },
+  })
+);
 app.use(passport.initialize());
 
 // In-memory store for demo (use a database in production)
@@ -69,6 +86,7 @@ app.post('/api/register', async (req, res) => {
     };
     users.set(username, user);
 
+    req.session.user = { id: user.id, username: user.username };
     res.status(201).json({
       user: {
         id: user.id,
@@ -100,6 +118,7 @@ app.post('/api/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid username or password' });
     }
 
+    req.session.user = { id: user.id, username: user.username };
     res.json({
       user: {
         id: user.id,
