@@ -35,6 +35,7 @@ export function createAuthRoutes({ frontendUrl, tokenStore }) {
     );
   }
 
+  
   // Facebook OAuth
   if (process.env.FACEBOOK_APP_ID && process.env.FACEBOOK_APP_SECRET) {
     router.get('/facebook', passport.authenticate('facebook', { scope: ['email'] }));
