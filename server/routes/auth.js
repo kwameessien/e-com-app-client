@@ -61,14 +61,19 @@ export function createAuthRoutes({ frontendUrl, tokenStore }) {
     res.json({ user: req.session.user });
   });
 
-  // Logout - destroy session
+  // Logout - terminate session using Passport's logout and destroy session
   router.post('/logout', (req, res) => {
-    req.session.destroy((err) => {
+    req.logout((err) => {
       if (err) {
         return res.status(500).json({ message: 'Logout failed' });
       }
-      res.clearCookie('connect.sid', { path: '/' });
-      res.json({ success: true });
+      req.session.destroy((destroyErr) => {
+        if (destroyErr) {
+          return res.status(500).json({ message: 'Logout failed' });
+        }
+        res.clearCookie('connect.sid', { path: '/' });
+        res.json({ success: true });
+      });
     });
   });
 
