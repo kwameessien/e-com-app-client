@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+export const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 export async function register(username, password) {
   const response = await fetch(`${API_BASE}/api/register`, {
@@ -29,6 +29,16 @@ export async function login(username, password) {
   if (!response.ok) {
     const error = await response.json().catch(() => ({ message: 'Login failed' }));
     throw new Error(error.message || 'Login failed');
+  }
+
+  return response.json();
+}
+
+export async function getOAuthSession(token) {
+  const response = await fetch(`${API_BASE}/api/auth/session?token=${encodeURIComponent(token)}`);
+
+  if (!response.ok) {
+    throw new Error('Session exchange failed');
   }
 
   return response.json();

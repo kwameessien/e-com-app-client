@@ -1,13 +1,19 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { login as loginUser } from '../services/authService';
+import { login as loginUser, API_BASE } from '../services/authService';
 
 function Login() {
+  const [searchParams] = useSearchParams();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const urlError = searchParams.get('error');
+    if (urlError) setError(decodeURIComponent(urlError.replace(/\+/g, ' ')));
+  }, [searchParams]);
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -59,6 +65,26 @@ function Login() {
           {loading ? 'Logging in...' : 'Log In'}
         </button>
       </form>
+
+      <div className="auth-divider">
+        <span>or</span>
+      </div>
+
+      <div className="auth-social">
+        <a
+          href={`${API_BASE}/api/auth/google`}
+          className="auth-social-btn auth-social-google"
+        >
+          Sign in with Google
+        </a>
+        <a
+          href={`${API_BASE}/api/auth/facebook`}
+          className="auth-social-btn auth-social-facebook"
+        >
+          Sign in with Facebook
+        </a>
+      </div>
+
       <p className="auth-switch">
         Don&apos;t have an account? <Link to="/register">Register</Link>
       </p>

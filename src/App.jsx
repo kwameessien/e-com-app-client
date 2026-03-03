@@ -6,6 +6,7 @@ import Products from './pages/Products';
 import Cart from './pages/Cart';
 import Register from './pages/Register';
 import Login from './pages/Login';
+import AuthCallback from './pages/AuthCallback';
 import './App.css';
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
           <Route path="cart" element={<Cart />} />
           <Route path="register" element={<Register />} />
           <Route path="login" element={<Login />} />
+          <Route path="auth/callback" element={<AuthCallback />} />
         </Route>
       </Routes>
     </AuthProvider>
