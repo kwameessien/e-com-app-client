@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { getProduct } from '../services/productService';
 import { useCart } from '../hooks/useCart';
+import { useAuth } from '../hooks/useAuth';
 
 function ProductDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const { addToCart, cartItems } = useCart();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -22,11 +25,21 @@ function ProductDetail() {
 
   const handleAddToCart = async () => {
     if (!product || isInCart || adding) return;
+    if (!user) {
+      navigate(`/login?redirect=${encodeURIComponent(`/products/${id}`)}`, {
+        replace: true,
+      });
+      return;
+    }
     setAdding(true);
     try {
       await addToCart(product);
-    } catch {
-      // Error handled by caller if needed
+    } catch (err) {
+      if (err.status === 401) {
+        navigate(`/login?redirect=${encodeURIComponent(`/products/${id}`)}`, {
+          replace: true,
+        });
+      }
     } finally {
       setAdding(false);
     }

@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import Stripe from 'stripe';
+import { requireAuth } from '../middleware/auth.js';
 
 const stripe = process.env.STRIPE_SECRET_KEY
   ? new Stripe(process.env.STRIPE_SECRET_KEY)
@@ -11,16 +12,13 @@ const stripe = process.env.STRIPE_SECRET_KEY
  */
 export function createPaymentsRoutes() {
   const router = Router();
+  router.use(requireAuth);
 
   router.post('/create-payment-intent', async (req, res) => {
     if (!stripe) {
       return res.status(503).json({
         message: 'Stripe not configured. Set STRIPE_SECRET_KEY in .env',
       });
-    }
-
-    if (!req.session?.user) {
-      return res.status(401).json({ message: 'Not authenticated' });
     }
 
     const cart = req.session.cart || [];

@@ -6,6 +6,9 @@ export async function getCart() {
   const response = await fetch(`${API_BASE}/api/cart`, fetchOptions);
 
   if (!response.ok) {
+    if (response.status === 401) {
+      return [];
+    }
     throw new Error('Failed to fetch cart');
   }
 
@@ -25,7 +28,9 @@ export async function addToCart(productId, quantity = 1) {
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    throw new Error(error.message || 'Failed to add to cart');
+    const err = new Error(error.message || 'Failed to add to cart');
+    err.status = response.status;
+    throw err;
   }
 
   const data = await response.json();
@@ -43,7 +48,10 @@ export async function updateCartItem(productId, quantity) {
   });
 
   if (!response.ok) {
-    throw new Error('Failed to update cart');
+    const error = await response.json().catch(() => ({}));
+    const err = new Error(error.message || 'Failed to update cart');
+    err.status = response.status;
+    throw err;
   }
 
   const data = await response.json();
@@ -57,7 +65,10 @@ export async function removeFromCart(productId) {
   });
 
   if (!response.ok) {
-    throw new Error('Failed to remove from cart');
+    const error = await response.json().catch(() => ({}));
+    const err = new Error(error.message || 'Failed to remove from cart');
+    err.status = response.status;
+    throw err;
   }
 
   const data = await response.json();
@@ -75,7 +86,9 @@ export async function createPaymentIntent() {
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    throw new Error(error.message || 'Failed to create payment');
+    const err = new Error(error.message || 'Failed to create payment');
+    err.status = response.status;
+    throw err;
   }
 
   const data = await response.json();
@@ -94,7 +107,9 @@ export async function checkout(paymentIntentId) {
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    throw new Error(error.message || 'Checkout failed');
+    const err = new Error(error.message || 'Checkout failed');
+    err.status = response.status;
+    throw err;
   }
 
   return response.json();

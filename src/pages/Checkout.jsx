@@ -64,7 +64,15 @@ function Checkout() {
           refreshCart();
           navigate('/orders');
         })
-        .catch((err) => setError(err.message || 'Failed to complete order'))
+        .catch((err) => {
+          if (err.status === 401) {
+            navigate(`/login?redirect=${encodeURIComponent('/checkout')}`, {
+              replace: true,
+            });
+          } else {
+            setError(err.message || 'Failed to complete order');
+          }
+        })
         .finally(() => setLoading(false));
       return;
     }
@@ -78,7 +86,11 @@ function Checkout() {
       createPaymentIntent()
         .then(setClientSecret)
         .catch((err) => {
-          if (err.message?.includes('Stripe not configured')) {
+          if (err.status === 401) {
+            navigate(`/login?redirect=${encodeURIComponent('/checkout')}`, {
+              replace: true,
+            });
+          } else if (err.message?.includes('Stripe not configured')) {
             setClientSecret('dev-mode');
           } else {
             setError(err.message || 'Failed to initialize payment');
@@ -132,7 +144,13 @@ function Checkout() {
       refreshCart();
       navigate('/orders');
     } catch (err) {
-      setError(err.message || 'Checkout failed');
+      if (err.status === 401) {
+        navigate(`/login?redirect=${encodeURIComponent('/checkout')}`, {
+          replace: true,
+        });
+      } else {
+        setError(err.message || 'Checkout failed');
+      }
     } finally {
       setLoading(false);
     }

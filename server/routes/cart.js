@@ -1,11 +1,14 @@
 import { Router } from 'express';
+import { requireAuth } from '../middleware/auth.js';
 
 /**
  * Cart API - current active cart stored in session.
  * Distinct from past orders (order history).
+ * All cart operations require authentication.
  */
 export function createCartRoutes({ products }) {
   const router = Router();
+  router.use(requireAuth);
 
   const ensureCart = (req) => {
     if (!req.session.cart) {

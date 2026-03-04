@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { stripe } from './payments.js';
+import { requireAuth } from '../middleware/auth.js';
 
 // In-memory orders (use a database in production)
 const orders = [];
@@ -10,22 +11,16 @@ const orders = [];
  */
 export function createOrdersRoutes() {
   const router = Router();
+  router.use(requireAuth);
 
   // Get order history for current user
   router.get('/', (req, res) => {
-    if (!req.session?.user) {
-      return res.status(401).json({ message: 'Not authenticated' });
-    }
     const userOrders = orders.filter((o) => o.userId === req.session.user.id);
     res.json({ orders: userOrders });
   });
 
   // Create order (checkout) - verifies Stripe payment, then moves cart to order
   router.post('/', async (req, res) => {
-    if (!req.session?.user) {
-      return res.status(401).json({ message: 'Not authenticated' });
-    }
-
     const cart = req.session.cart || [];
     if (cart.length === 0) {
       return res.status(400).json({ message: 'Cart is empty' });

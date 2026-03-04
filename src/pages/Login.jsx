@@ -24,7 +24,10 @@ function Login() {
     try {
       const data = await loginUser(username, password);
       login(data.user);
-      navigate('/');
+      const redirect = searchParams.get('redirect');
+      navigate(redirect && redirect.startsWith('/') ? redirect : '/', {
+        replace: true,
+      });
     } catch (err) {
       setError(err.message || 'Login failed');
     } finally {

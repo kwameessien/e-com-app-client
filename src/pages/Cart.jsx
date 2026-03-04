@@ -1,8 +1,41 @@
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../hooks/useCart';
 
 function Cart() {
+  const navigate = useNavigate();
   const { cartItems, removeFromCart, updateQuantity } = useCart();
+  const [error, setError] = useState(null);
+
+  const handleRemove = async (productId) => {
+    setError(null);
+    try {
+      await removeFromCart(productId);
+    } catch (err) {
+      if (err.status === 401) {
+        navigate(`/login?redirect=${encodeURIComponent('/cart')}`, {
+          replace: true,
+        });
+      } else {
+        setError(err.message || 'Failed to remove item');
+      }
+    }
+  };
+
+  const handleQuantityChange = async (productId, quantity) => {
+    setError(null);
+    try {
+      await updateQuantity(productId, quantity);
+    } catch (err) {
+      if (err.status === 401) {
+        navigate(`/login?redirect=${encodeURIComponent('/cart')}`, {
+          replace: true,
+        });
+      } else {
+        setError(err.message || 'Failed to update quantity');
+      }
+    }
+  };
 
   if (cartItems.length === 0) {
     return (
@@ -17,6 +50,7 @@ function Cart() {
   return (
     <div className="cart-page">
       <h1>Shopping Cart</h1>
+      {error && <p className="cart-error">{error}</p>}
       <ul className="cart-list">
         {cartItems.map(({ product, quantity }) => (
           <li key={product.id} className="cart-item">
@@ -35,14 +69,17 @@ function Cart() {
                     min="1"
                     value={quantity}
                     onChange={(e) =>
-                      updateQuantity(product.id, parseInt(e.target.value, 10) || 1)
+                      handleQuantityChange(
+                        product.id,
+                        parseInt(e.target.value, 10) || 1
+                      )
                     }
                     className="cart-item-qty"
                   />
                 </label>
                 <button
                   type="button"
-                  onClick={() => removeFromCart(product.id)}
+                  onClick={() => handleRemove(product.id)}
                   className="cart-item-remove"
                 >
                   Remove
