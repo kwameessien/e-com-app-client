@@ -119,10 +119,25 @@ export async function getOrders() {
   const response = await fetch(`${API_BASE}/api/orders`, fetchOptions);
 
   if (!response.ok) {
-    if (response.status === 401) return [];
-    throw new Error('Failed to fetch orders');
+    const error = await response.json().catch(() => ({}));
+    const err = new Error(error.message || 'Failed to fetch orders');
+    err.status = response.status;
+    throw err;
   }
 
   const data = await response.json();
   return data.orders;
+}
+
+export async function getOrder(id) {
+  const response = await fetch(`${API_BASE}/api/orders/${id}`, fetchOptions);
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    const err = new Error(error.message || 'Failed to fetch order');
+    err.status = response.status;
+    throw err;
+  }
+
+  return response.json();
 }

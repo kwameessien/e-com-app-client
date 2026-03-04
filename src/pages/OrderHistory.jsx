@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { getOrders } from '../services/cartService';
 
 function OrderHistory() {
+  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -10,9 +11,17 @@ function OrderHistory() {
   useEffect(() => {
     getOrders()
       .then(setOrders)
-      .catch((err) => setError(err.message || 'Failed to load orders'))
+      .catch((err) => {
+        if (err.status === 401) {
+          navigate(`/login?redirect=${encodeURIComponent('/orders')}`, {
+            replace: true,
+          });
+        } else {
+          setError(err.message || 'Failed to load orders');
+        }
+      })
       .finally(() => setLoading(false));
-  }, []);
+  }, [navigate]);
 
   if (loading) {
     return (
@@ -53,7 +62,12 @@ function OrderHistory() {
         {orders.map((order) => (
           <li key={order.id} className="order-item">
             <div className="order-header">
-              <span className="order-id">Order {order.id.slice(0, 8)}</span>
+              <Link to={`/orders/${order.id}`} className="order-id">
+                Order {order.id.slice(0, 8)}
+              </Link>
+              <span className="order-status" data-status={order.status || 'completed'}>
+                {order.status || 'completed'}
+              </span>
               <span className="order-date">
                 {new Date(order.createdAt).toLocaleDateString()}
               </span>

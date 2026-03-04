@@ -19,6 +19,17 @@ export function createOrdersRoutes() {
     res.json({ orders: userOrders });
   });
 
+  // Get single order (only user's own orders)
+  router.get('/:id', (req, res) => {
+    const order = orders.find(
+      (o) => o.id === req.params.id && o.userId === req.session.user.id
+    );
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+    res.json(order);
+  });
+
   // Create order (checkout) - verifies Stripe payment, then moves cart to order
   router.post('/', async (req, res) => {
     const cart = req.session.cart || [];
@@ -48,6 +59,7 @@ export function createOrdersRoutes() {
     const order = {
       id: crypto.randomUUID(),
       userId: req.session.user.id,
+      status: 'completed',
       items: cart.map((item) => ({
         product: item.product,
         quantity: item.quantity,

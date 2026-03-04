@@ -514,17 +514,48 @@ footer {
 
 .order-header {
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
   margin-bottom: 0.75rem;
 }
 
 .order-id {
   font-weight: 600;
+  text-decoration: none;
+}
+
+.order-id:hover {
+  text-decoration: underline;
+}
+
+.order-status {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.order-status[data-status='completed'] {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+}
+
+.order-status[data-status='pending'] {
+  background: rgba(234, 179, 8, 0.2);
+  color: #eab308;
+}
+
+.order-status[data-status='shipped'] {
+  background: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
 }
 
 .order-date {
   color: #888;
   font-size: 0.9rem;
+  margin-left: auto;
 }
 
 .order-items {
@@ -546,6 +577,28 @@ footer {
 .order-total {
   font-weight: 600;
   margin: 0;
+}
+
+/* Order detail page */
+.order-detail {
+  max-width: 600px;
+}
+
+.order-detail-back {
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+
+.order-detail-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.order-detail-items-title {
+  font-size: 1.1rem;
+  margin: 0 0 0.5rem;
 }
 
 h1 {

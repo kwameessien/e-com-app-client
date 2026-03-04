@@ -9,6 +9,7 @@ import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import OrderHistory from './pages/OrderHistory';
+import OrderDetail from './pages/OrderDetail';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import AuthCallback from './pages/AuthCallback';
@@ -49,6 +50,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <OrderHistory />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="orders/:id"
+              element={
+                <ProtectedRoute>
+                  <OrderDetail />
                 </ProtectedRoute>
               }
             />
