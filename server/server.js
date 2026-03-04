@@ -8,6 +8,7 @@ import { configurePassport } from './config/passport.js';
 import { createAuthRoutes } from './routes/auth.js';
 import { createCartRoutes } from './routes/cart.js';
 import { createOrdersRoutes } from './routes/orders.js';
+import { createPaymentsRoutes } from './routes/payments.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -112,6 +113,9 @@ app.use('/api/cart', createCartRoutes({ products }));
 
 // Orders API (past orders - order history)
 app.use('/api/orders', createOrdersRoutes());
+
+// Payments API (Stripe)
+app.use('/api/payments', createPaymentsRoutes());
 
 // Register
 app.post('/api/register', async (req, res) => {

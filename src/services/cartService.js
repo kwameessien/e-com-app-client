@@ -64,13 +64,32 @@ export async function removeFromCart(productId) {
   return data.items;
 }
 
-export async function checkout() {
+export async function createPaymentIntent() {
+  const response = await fetch(`${API_BASE}/api/payments/create-payment-intent`, {
+    method: 'POST',
+    ...fetchOptions,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.message || 'Failed to create payment');
+  }
+
+  const data = await response.json();
+  return data.clientSecret;
+}
+
+export async function checkout(paymentIntentId) {
   const response = await fetch(`${API_BASE}/api/orders`, {
     method: 'POST',
     ...fetchOptions,
     headers: {
       'Content-Type': 'application/json',
     },
+    body: JSON.stringify({ paymentIntentId: paymentIntentId || undefined }),
   });
 
   if (!response.ok) {

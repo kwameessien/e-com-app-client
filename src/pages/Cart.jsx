@@ -1,29 +1,10 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useCart } from '../hooks/useCart';
-import { checkout } from '../services/cartService';
 
 function Cart() {
-  const navigate = useNavigate();
-  const { cartItems, removeFromCart, updateQuantity, refreshCart } = useCart();
-  const [checkingOut, setCheckingOut] = useState(false);
-  const [checkoutError, setCheckoutError] = useState(null);
+  const { cartItems, removeFromCart, updateQuantity } = useCart();
 
-  const handleCheckout = async () => {
-    setCheckoutError(null);
-    setCheckingOut(true);
-    try {
-      await checkout();
-      refreshCart();
-      navigate('/orders');
-    } catch (err) {
-      setCheckoutError(err.message || 'Checkout failed');
-    } finally {
-      setCheckingOut(false);
-    }
-  };
-
-  if (cartItems.length === 0 && !checkingOut) {
+  if (cartItems.length === 0) {
     return (
       <div className="cart-page">
         <h1>Shopping Cart</h1>
@@ -80,15 +61,9 @@ function Cart() {
           .reduce((sum, { product, quantity }) => sum + (product.price ?? 0) * quantity, 0)
           .toFixed(2)}
       </p>
-      {checkoutError && <p className="cart-error">{checkoutError}</p>}
-      <button
-        type="button"
-        onClick={handleCheckout}
-        disabled={checkingOut}
-        className="cart-checkout-btn"
-      >
-        {checkingOut ? 'Processing...' : 'Checkout'}
-      </button>
+      <Link to="/checkout" className="cart-checkout-btn">
+        Proceed to Checkout
+      </Link>
     </div>
   );
 }

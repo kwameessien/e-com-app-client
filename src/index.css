@@ -433,6 +433,61 @@ footer {
 
 .cart-checkout-btn {
   margin-top: 0.5rem;
+  display: inline-block;
+  text-decoration: none;
+  text-align: center;
+}
+
+/* Checkout page */
+.checkout-page h1 {
+  margin-bottom: 1.5rem;
+}
+
+.checkout-summary {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+.checkout-summary h2,
+.checkout-payment h2 {
+  font-size: 1.1rem;
+  margin: 0 0 1rem;
+}
+
+.checkout-items {
+  list-style: none;
+  margin: 0 0 0.5rem;
+  padding: 0;
+}
+
+.checkout-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.checkout-total {
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin: 0.5rem 0 0;
+}
+
+.checkout-payment {
+  margin-bottom: 1.5rem;
+}
+
+.checkout-dev-notice {
+  color: #888;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.checkout-back {
+  display: inline-block;
+  margin-top: 1rem;
 }
 
 /* Order history */

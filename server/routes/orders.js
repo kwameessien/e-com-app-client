@@ -1,11 +1,12 @@
 import { Router } from 'express';
+import { stripe } from './payments.js';
 
 // In-memory orders (use a database in production)
 const orders = [];
 
 /**
  * Orders API - past orders (order history).
- * Distinct from current cart. Orders are created on checkout.
+ * Distinct from current cart. Orders are created on checkout after payment.
  */
 export function createOrdersRoutes() {
   const router = Router();
@@ -19,8 +20,8 @@ export function createOrdersRoutes() {
     res.json({ orders: userOrders });
   });
 
-  // Create order (checkout) - moves cart to order, clears cart
-  router.post('/', (req, res) => {
+  // Create order (checkout) - verifies Stripe payment, then moves cart to order
+  router.post('/', async (req, res) => {
     if (!req.session?.user) {
       return res.status(401).json({ message: 'Not authenticated' });
     }
@@ -28,6 +29,25 @@ export function createOrdersRoutes() {
     const cart = req.session.cart || [];
     if (cart.length === 0) {
       return res.status(400).json({ message: 'Cart is empty' });
+    }
+
+    const { paymentIntentId } = req.body;
+
+    if (stripe && paymentIntentId) {
+      try {
+        const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+        if (paymentIntent.status !== 'succeeded') {
+          return res.status(400).json({ message: 'Payment not completed' });
+        }
+        if (paymentIntent.metadata?.userId !== req.session.user.id) {
+          return res.status(403).json({ message: 'Payment does not match user' });
+        }
+      } catch (err) {
+        console.error('Stripe verify error:', err);
+        return res.status(400).json({ message: 'Invalid payment' });
+      }
+    } else if (stripe) {
+      return res.status(400).json({ message: 'Payment required' });
     }
 
     const order = {
