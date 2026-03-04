@@ -45,32 +45,37 @@ const products = [
   {
     id: '1',
     name: 'Classic Cotton T-Shirt',
-    description: 'A comfortable, breathable cotton t-shirt perfect for everyday wear. Available in multiple colors.',
+    description: 'A comfortable, breathable cotton t-shirt perfect for everyday wear. Available in multiple colors. Made from 100% organic cotton with a relaxed fit.',
     image: 'https://picsum.photos/seed/shirt1/400/400',
+    price: 24.99,
   },
   {
     id: '2',
     name: 'Wireless Headphones',
-    description: 'Premium noise-canceling wireless headphones with 30-hour battery life and crystal-clear sound.',
+    description: 'Premium noise-canceling wireless headphones with 30-hour battery life and crystal-clear sound. Features Bluetooth 5.0 and a foldable design.',
     image: 'https://picsum.photos/seed/headphones2/400/400',
+    price: 149.99,
   },
   {
     id: '3',
     name: 'Leather Messenger Bag',
-    description: 'Handcrafted leather bag with multiple compartments. Ideal for work or travel.',
+    description: 'Handcrafted leather bag with multiple compartments. Ideal for work or travel. Full-grain leather with brass hardware.',
     image: 'https://picsum.photos/seed/bag3/400/400',
+    price: 189.99,
   },
   {
     id: '4',
     name: 'Stainless Steel Water Bottle',
-    description: 'Keep your drinks cold for 24 hours or hot for 12. BPA-free and eco-friendly.',
+    description: 'Keep your drinks cold for 24 hours or hot for 12. BPA-free and eco-friendly. 32oz capacity with leak-proof lid.',
     image: 'https://picsum.photos/seed/bottle4/400/400',
+    price: 34.99,
   },
   {
     id: '5',
     name: 'Running Shoes',
-    description: 'Lightweight, cushioned running shoes designed for comfort and performance on any terrain.',
+    description: 'Lightweight, cushioned running shoes designed for comfort and performance on any terrain. Breathable mesh upper with responsive midsole.',
     image: 'https://picsum.photos/seed/shoes5/400/400',
+    price: 119.99,
   },
 ];
 
