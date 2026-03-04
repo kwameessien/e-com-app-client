@@ -40,6 +40,40 @@ const users = new Map();
 const usersByProvider = new Map(); // "google:id" or "facebook:id" -> user
 const tokenStore = new Map(); // one-time token -> user (expires after use)
 
+// Sample products (use a database in production)
+const products = [
+  {
+    id: '1',
+    name: 'Classic Cotton T-Shirt',
+    description: 'A comfortable, breathable cotton t-shirt perfect for everyday wear. Available in multiple colors.',
+    image: 'https://picsum.photos/seed/shirt1/400/400',
+  },
+  {
+    id: '2',
+    name: 'Wireless Headphones',
+    description: 'Premium noise-canceling wireless headphones with 30-hour battery life and crystal-clear sound.',
+    image: 'https://picsum.photos/seed/headphones2/400/400',
+  },
+  {
+    id: '3',
+    name: 'Leather Messenger Bag',
+    description: 'Handcrafted leather bag with multiple compartments. Ideal for work or travel.',
+    image: 'https://picsum.photos/seed/bag3/400/400',
+  },
+  {
+    id: '4',
+    name: 'Stainless Steel Water Bottle',
+    description: 'Keep your drinks cold for 24 hours or hot for 12. BPA-free and eco-friendly.',
+    image: 'https://picsum.photos/seed/bottle4/400/400',
+  },
+  {
+    id: '5',
+    name: 'Running Shoes',
+    description: 'Lightweight, cushioned running shoes designed for comfort and performance on any terrain.',
+    image: 'https://picsum.photos/seed/shoes5/400/400',
+  },
+];
+
 // OAuth: find or create user from provider profile
 function findOrCreateOAuthUser(provider, profile) {
   const providerKey = `${provider}:${profile.id}`;
@@ -132,6 +166,19 @@ app.post('/api/login', async (req, res) => {
     console.error('Login error:', err);
     res.status(500).json({ message: 'Login failed' });
   }
+});
+
+// Products API
+app.get('/api/products', (_req, res) => {
+  res.json(products);
+});
+
+app.get('/api/products/:id', (req, res) => {
+  const product = products.find((p) => p.id === req.params.id);
+  if (!product) {
+    return res.status(404).json({ message: 'Product not found' });
+  }
+  res.json(product);
 });
 
 app.listen(PORT, () => {
