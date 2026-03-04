@@ -26,6 +26,8 @@ function ProductDetail() {
     try {
       await addToCart(product);
     } catch {
+      // Error handled by caller if needed
+    } finally {
       setAdding(false);
     }
   };
