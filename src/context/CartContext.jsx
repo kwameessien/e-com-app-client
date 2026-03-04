@@ -1,38 +1,49 @@
-import { createContext, useState } from 'react';
+import { createContext, useState, useEffect, useCallback } from 'react';
+import {
+  getCart,
+  addToCart as addToCartApi,
+  updateCartItem,
+  removeFromCart as removeFromCartApi,
+} from '../services/cartService';
 
 const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const addToCart = (product, quantity = 1) => {
-    setCartItems((prev) => {
-      const existing = prev.find((item) => item.product.id === product.id);
-      if (existing) {
-        return prev.map((item) =>
-          item.product.id === product.id
-            ? { ...item, quantity: item.quantity + quantity }
-            : item
-        );
-      }
-      return [...prev, { product, quantity }];
-    });
+  const refreshCart = useCallback(async () => {
+    try {
+      const items = await getCart();
+      setCartItems(items);
+    } catch {
+      setCartItems([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    refreshCart();
+  }, [refreshCart]);
+
+  const addToCart = async (product, quantity = 1) => {
+    const items = await addToCartApi(product.id, quantity);
+    setCartItems(items);
   };
 
-  const removeFromCart = (productId) => {
-    setCartItems((prev) => prev.filter((item) => item.product.id !== productId));
+  const removeFromCart = async (productId) => {
+    const items = await removeFromCartApi(productId);
+    setCartItems(items);
   };
 
-  const updateQuantity = (productId, quantity) => {
+  const updateQuantity = async (productId, quantity) => {
     if (quantity <= 0) {
-      removeFromCart(productId);
+      await removeFromCart(productId);
       return;
     }
-    setCartItems((prev) =>
-      prev.map((item) =>
-        item.product.id === productId ? { ...item, quantity } : item
-      )
-    );
+    const items = await updateCartItem(productId, quantity);
+    setCartItems(items);
   };
 
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -43,6 +54,8 @@ export function CartProvider({ children }) {
     removeFromCart,
     updateQuantity,
     cartCount,
+    loading,
+    refreshCart,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

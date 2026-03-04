@@ -5,11 +5,11 @@ import { useCart } from '../hooks/useCart';
 
 function ProductDetail() {
   const { id } = useParams();
-  const { addToCart } = useCart();
+  const { addToCart, cartItems } = useCart();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [added, setAdded] = useState(false);
+  const [adding, setAdding] = useState(false);
 
   useEffect(() => {
     getProduct(id)
@@ -18,10 +18,16 @@ function ProductDetail() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  const handleAddToCart = () => {
-    if (!product) return;
-    addToCart(product);
-    setAdded(true);
+  const isInCart = cartItems.some((item) => item.product.id === id);
+
+  const handleAddToCart = async () => {
+    if (!product || isInCart || adding) return;
+    setAdding(true);
+    try {
+      await addToCart(product);
+    } catch {
+      setAdding(false);
+    }
   };
 
   if (loading) {
@@ -64,11 +70,11 @@ function ProductDetail() {
             type="button"
             onClick={handleAddToCart}
             className="product-detail-add-btn"
-            disabled={added}
+            disabled={isInCart || adding}
           >
-            {added ? 'Added to Cart' : 'Add to Cart'}
+            {adding ? 'Adding...' : isInCart ? 'Added to Cart' : 'Add to Cart'}
           </button>
-          {added && (
+          {(isInCart || adding) && (
             <Link to="/cart" className="product-detail-cart-link">
               View Cart
             </Link>

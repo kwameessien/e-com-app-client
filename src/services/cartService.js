@@ -1,0 +1,94 @@
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
+const fetchOptions = { credentials: 'include' };
+
+export async function getCart() {
+  const response = await fetch(`${API_BASE}/api/cart`, fetchOptions);
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch cart');
+  }
+
+  const data = await response.json();
+  return data.items;
+}
+
+export async function addToCart(productId, quantity = 1) {
+  const response = await fetch(`${API_BASE}/api/cart`, {
+    method: 'POST',
+    ...fetchOptions,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ productId, quantity }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.message || 'Failed to add to cart');
+  }
+
+  const data = await response.json();
+  return data.items;
+}
+
+export async function updateCartItem(productId, quantity) {
+  const response = await fetch(`${API_BASE}/api/cart/${productId}`, {
+    method: 'PUT',
+    ...fetchOptions,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ quantity }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to update cart');
+  }
+
+  const data = await response.json();
+  return data.items;
+}
+
+export async function removeFromCart(productId) {
+  const response = await fetch(`${API_BASE}/api/cart/${productId}`, {
+    method: 'DELETE',
+    ...fetchOptions,
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to remove from cart');
+  }
+
+  const data = await response.json();
+  return data.items;
+}
+
+export async function checkout() {
+  const response = await fetch(`${API_BASE}/api/orders`, {
+    method: 'POST',
+    ...fetchOptions,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.message || 'Checkout failed');
+  }
+
+  return response.json();
+}
+
+export async function getOrders() {
+  const response = await fetch(`${API_BASE}/api/orders`, fetchOptions);
+
+  if (!response.ok) {
+    if (response.status === 401) return [];
+    throw new Error('Failed to fetch orders');
+  }
+
+  const data = await response.json();
+  return data.orders;
+}

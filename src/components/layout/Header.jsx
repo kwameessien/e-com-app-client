@@ -15,6 +15,7 @@ function Header() {
           Cart
           {cartCount > 0 && <span className="nav-cart-badge">{cartCount}</span>}
         </Link>
+        {user && <Link to="/orders">Orders</Link>}
         {user ? (
           <>
             <span className="nav-user">Hello, {user.username}</span>

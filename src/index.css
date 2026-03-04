@@ -423,6 +423,74 @@ footer {
 .cart-total {
   font-size: 1.25rem;
   font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.cart-error {
+  color: #f87171;
+  margin-bottom: 1rem;
+}
+
+.cart-checkout-btn {
+  margin-top: 0.5rem;
+}
+
+/* Order history */
+.order-history h1 {
+  margin-bottom: 1rem;
+}
+
+.order-history-intro {
+  color: #888;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.order-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.order-item {
+  padding: 1.5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.order-id {
+  font-weight: 600;
+}
+
+.order-date {
+  color: #888;
+  font-size: 0.9rem;
+}
+
+.order-items {
+  list-style: none;
+  margin: 0 0 0.5rem;
+  padding: 0;
+}
+
+.order-line-item {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.order-line-item a {
+  flex: 1;
+}
+
+.order-total {
+  font-weight: 600;
+  margin: 0;
 }
 
 h1 {
@@ -496,6 +564,12 @@ button:focus-visible {
   .cart-item-qty {
     border-color: rgba(0, 0, 0, 0.2);
     background: rgba(0, 0, 0, 0.03);
+  }
+  .cart-error {
+    color: #dc2626;
+  }
+  .order-item {
+    border-bottom-color: rgba(0, 0, 0, 0.1);
   }
   a:hover {
     color: #747bff;

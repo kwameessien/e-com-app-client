@@ -6,6 +6,8 @@ import bcrypt from 'bcryptjs';
 import passport from 'passport';
 import { configurePassport } from './config/passport.js';
 import { createAuthRoutes } from './routes/auth.js';
+import { createCartRoutes } from './routes/cart.js';
+import { createOrdersRoutes } from './routes/orders.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -104,6 +106,12 @@ configurePassport({
 
 // Mount OAuth routes
 app.use('/api/auth', createAuthRoutes({ frontendUrl: FRONTEND_URL, tokenStore }));
+
+// Cart API (current active cart - session-based)
+app.use('/api/cart', createCartRoutes({ products }));
+
+// Orders API (past orders - order history)
+app.use('/api/orders', createOrdersRoutes());
 
 // Register
 app.post('/api/register', async (req, res) => {
